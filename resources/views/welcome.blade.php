@@ -8,9 +8,28 @@
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+        <!-- Scripts -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+
+        <!-- Flowchart CSS and JS -->
+        <link rel="stylesheet" href="{{URL::asset('dist/jquery.flowchart.css')}}">
+        <script src="{{URL::asset('dist/jquery.flowchart.js')}}"></script>
+        <script src="{{URL::asset('app.js')}}"></script>
 
         <!-- Styles -->
         <style>
+            .flowchart-example-container {
+                width: 800px;
+                height: 400px;
+                background: white;
+                border: 1px solid #BBB;
+                margin-bottom: 10px;
+            }
+
             html, body {
                 background-color: #fff;
                 color: #636b6f;
@@ -65,34 +84,94 @@
     </head>
     <body>
         <div class="flex-center position-ref full-height">
-            @if (Route::has('login'))
-                <div class="top-right links">
-                    @auth
-                        <a href="{{ url('/home') }}">Home</a>
-                    @else
-                        <a href="{{ route('login') }}">Login</a>
-
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}">Register</a>
-                        @endif
-                    @endauth
-                </div>
-            @endif
-
             <div class="content">
-                <div class="title m-b-md">
-                    Laravel
+                <h1>Flowchart</h1>
+                <div id="chart_container">
+                    <div class="flowchart-example-container" id="flowchartworkspace"></div>
+                </div>
+                <div class="draggable_operators">
+                    <div class="draggable_operators_label font-weight-bold">
+                        Operators (drag and drop them in the flowchart):
+                    </div>
+                    <div class="draggable_operators_divs btn-group mt-2" role="group">
+                        <div class="draggable_operator btn btn-info" data-nb-inputs="1" data-nb-outputs="0">1 input</div>
+                        <div class="draggable_operator btn btn-info" data-nb-inputs="0" data-nb-outputs="1">1 output</div>
+                        <div class="draggable_operator btn btn-info" data-nb-inputs="1" data-nb-outputs="1">1 input &amp; 1 output</div>
+                        <div class="draggable_operator btn btn-info" data-nb-inputs="1" data-nb-outputs="2">1 in &amp; 2 out</div>
+                        <div class="draggable_operator btn btn-info" data-nb-inputs="2" data-nb-outputs="1">2 in &amp; 1 out</div>
+                        <div class="draggable_operator btn btn-info" data-nb-inputs="2" data-nb-outputs="2">2 in &amp; 2 out</div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary mt-4" onclick="openCreateModal()">Create operator</button>
+                <button class="btn btn-primary mt-4" id="save_local">Save Flowchart</button>
+                <button class="btn btn-primary mt-4" id="load_local">Load Flowchart</button>
+
+                <!-- Update Modal -->
+                <div class="modal fade" id="updateModal" role="dialog">
+                    <div class="modal-dialog modal-dialog-centered">
+                      <!-- Modal content-->
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Update Selected Card</h4>
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="operator_properties" style="display: block;">
+                                    <label for="operator_title" class="font-weight-bold">Card's title: </label>
+                                    <input id="operator_title" type="text" class="form-control">
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button id="delete_selected_button" class="btn btn-danger">Delete</button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">Save</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="links">
-                    <a href="https://laravel.com/docs">Docs</a>
-                    <a href="https://laracasts.com">Laracasts</a>
-                    <a href="https://laravel-news.com">News</a>
-                    <a href="https://blog.laravel.com">Blog</a>
-                    <a href="https://nova.laravel.com">Nova</a>
-                    <a href="https://forge.laravel.com">Forge</a>
-                    <a href="https://vapor.laravel.com">Vapor</a>
-                    <a href="https://github.com/laravel/laravel">GitHub</a>
+                <!-- Create Modal -->
+                <div class="modal fade" id="createModal" role="dialog">
+                    <div class="modal-dialog modal-dialog-centered">
+                      <!-- Modal content-->
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Create New Card</h4>
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="card_title" class="font-weight-bold">Card's title: </label>
+                                    <input id="card_title" type="text" class="form-control" placeholder="Title Here ...">
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label for="card_title" class="font-weight-bold">Add Attributes</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="attribute" id="attr_link" value="1">
+                                    <label class="form-check-label font-weight-bold" for="attr_link">Link</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="attribute" id="attr_update" value="2">
+                                    <label class="form-check-label font-weight-bold" for="attr_update">Modal Click</label>
+                                </div>
+                                <div class="form-group">
+                                    <label for="url" class="font-weight-bold">Link:</label>
+                                    <input id="url" type="text" class="form-control" placeholder="URL Here ..." readonly>
+                                </div>
+                                
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" id="create_operator">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="mt-4">
+                    <textarea id="flowchart_data" class="form-control"></textarea>
                 </div>
             </div>
         </div>
