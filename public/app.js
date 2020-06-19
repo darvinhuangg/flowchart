@@ -13,8 +13,8 @@ $(document).ready(function() {
         data: defaultFlowchartData,
         defaultSelectedLinkColor: '#000055',
         grid: 10,
-        multipleLinksOnInput: false,
-        multipleLinksOnOutput: false
+        multipleLinksOnInput: true,
+        multipleLinksOnOutput: true,
     });
 
     $('#attr_link, #attr_update').change(function(){
@@ -60,7 +60,9 @@ $(document).ready(function() {
     var $linkProperties = $('#link_properties');
     $linkProperties.hide();
     var $operatorTitle = $('#operator_title');
-    var $operatorLink = $('#operator_link');
+    var $operatorLinkUpdate = $('#operator_link_update');
+    var $operatorAttrModalUpdate = $('#attr_update_update');
+    var $operatorAttrLinkUpdate = $('#attr_link_update');
     var $linkColor = $('#link_color');
 
     $flowchart.flowchart({
@@ -70,11 +72,16 @@ $(document).ready(function() {
 
             var selectedCard = $flowchart.flowchart('getData');
 
-            if(selectedCard.operators[operatorId].properties.links == undefined || selectedCard.operators[operatorId].properties.links == ''){
-                $("#updateModal").modal();
-            } else {
-                window.open(selectedCard.operators[operatorId].properties.links, "_blank");
-            }
+            $operatorLinkUpdate.val(selectedCard.operators[operatorId].url);
+            $operatorLinkUpdate.prop('disabled', selectedCard.operators[operatorId].url == '' || selectedCard.operators[operatorId].url == undefined ? true : false);
+            $operatorAttrModalUpdate.prop('checked', selectedCard.operators[operatorId].url == '' || selectedCard.operators[operatorId].url == undefined ? true : false);
+            $operatorAttrLinkUpdate.prop('checked', selectedCard.operators[operatorId].url ? true : false);
+
+            console.log(selectedCard);
+
+            // if(selectedCard.operators[operatorId].url !== undefined || selectedCard.operators[operatorId].url !== ''){
+            //     $operatorLink.val(selectedCard.operators[operatorId].url)
+            // }
 
 
             return true;
@@ -95,10 +102,10 @@ $(document).ready(function() {
     });
 
     $operatorTitle.keyup(function() {
-        var selectedOperatorId = $flowchart.flowchart('getSelectedOperatorId');
-        if (selectedOperatorId != null) {
-            $flowchart.flowchart('setOperatorTitle', selectedOperatorId, $operatorTitle.val());
-        }
+        // var selectedOperatorId = $flowchart.flowchart('getSelectedOperatorId');
+        // if (selectedOperatorId != null) {
+        //     $flowchart.flowchart('setOperatorTitle', selectedOperatorId, $operatorTitle.val());
+        // }
     });
 
     $linkColor.change(function() {
@@ -116,11 +123,58 @@ $(document).ready(function() {
     //--- start
     $('#delete_selected_button').click(function() {
         $flowchart.flowchart('deleteSelected');
-        $("#updateModal").modal('hide');
     });
+
     //--- end
     //--- delete operator / link button
     //-----------------------------------------
+
+    $('#update_selected_button').click(function() {
+        var selectedOperatorId = $flowchart.flowchart('getSelectedOperatorId');        
+        var cards = $flowchart.flowchart('getData');  
+        var selectedCard = cards.operators[selectedOperatorId];
+
+        
+        var operatorData = {
+            top: selectedCard.top,
+            left: selectedCard.left,
+            url: $operatorLinkUpdate.val(),
+            properties: selectedCard.properties,
+        }
+
+        // console.log(operatorData);
+        $flowchart.flowchart('createOperator', selectedOperatorId, operatorData);
+        $flowchart.flowchart('setOperatorTitle', selectedOperatorId, $operatorTitle.val());
+
+        $operatorProperties.hide();
+    })
+
+    $('#generate_flowchart').click(function() {
+        SaveToLocalStorage();
+        window.open('/generate', '_blank');
+    })
+
+    $('#attr_link').change(function(){
+        $('#url').prop('disabled', false);
+        $('#url').val('');
+    })
+
+    $('#attr_update').change(function(){
+        $('#url').prop('disabled', true);
+        $('#url').val('');
+    }) 
+
+    $('#attr_link_update').change(function(){
+        $('#operator_link_update').prop('disabled', false);
+        $('#operator_link_update').val('');
+    })
+
+    $('#attr_update_update').change(function(){
+        $('#operator_link_update').prop('disabled', true);
+        $('#operator_link_update').val('');
+    })    
+
+    
 
 
     //-----------------------------------------
@@ -135,10 +189,9 @@ $(document).ready(function() {
         var operatorData = {
             top: ($flowchart.height() / 2) - 30,
             left: ($flowchart.width() / 2) - 100 + (operatorI * 10),
-            links: url_href,
+            url: url_href,
             properties: {
                 title: operatorTitle,
-                links: url_href,
                 inputs: {
                     input_1: {
                         label: '*',
@@ -150,7 +203,6 @@ $(document).ready(function() {
                     }
                 }
             },
-            links: url_href,
         };
 
         operatorI++;
@@ -265,25 +317,11 @@ $(document).ready(function() {
 var defaultFlowchartData = {
     operators: {
         operator1: {
-            top: 20,
-            left: 20,
-            properties: {
-                title: 'Card 1',
-                links:'',
-                inputs: {},
-                outputs: {
-                    output_1: {
-                        label: '*',
-                    }
-                }
-            }
-        },
-        operator2: {
             top: 80,
             left: 300,
+            url:'',
             properties: {
-                title: 'Card 2',
-                links:'',
+                title: 'Card 1',
                 inputs: {
                     input_1: {
                         label: '*',
@@ -292,17 +330,19 @@ var defaultFlowchartData = {
                         label: '*',
                     },
                 },
-                outputs: {}
+                outputs: {
+                    output_1: {
+                        label: '*',
+                    },
+                    output_2: {
+                        label: '*',
+                    },
+                }
             }
         },
     },
     links: {
-        link_1: {
-            fromOperator: 'operator1',
-            fromConnector: 'output_1',
-            toOperator: 'operator2',
-            toConnector: 'input_2',
-        },
+        
     }
 };
 if (false) console.log('remove lint unused warning', defaultFlowchartData);

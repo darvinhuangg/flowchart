@@ -102,34 +102,35 @@
                         <div class="draggable_operator btn btn-info" data-nb-inputs="2" data-nb-outputs="2">2 in &amp; 2 out</div>
                     </div>
                 </div>
+
+                <div id="operator_properties" style="display: block;" class="mt-4 text-left border rounded p-2">
+                    <div class="form-group">
+                        <label for="operator_title" class="font-weight-bold">Card's title: </label>
+                        <input id="operator_title" type="text" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="operator_title" class="font-weight-bold">Add Attributes</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="attribute" id="attr_link_update" value="1">
+                        <label class="form-check-label font-weight-bold" for="attr_link">Link</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="attribute" id="attr_update_update" value="2">
+                        <label class="form-check-label font-weight-bold" for="attr_update">Modal Click</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="url" class="font-weight-bold">Link:</label>
+                        <input id="operator_link_update" type="text" class="form-control" placeholder="URL Here ...">
+                    </div>
+                    <button id="update_selected_button" class="btn btn-primary mt-2">Update</button>
+                    <button id="delete_selected_button" class="btn btn-danger mt-2">Delete</button>
+                </div>
                 
                 <button class="btn btn-primary mt-4" onclick="openCreateModal()">Create operator</button>
                 <button class="btn btn-primary mt-4" id="save_local">Save Flowchart</button>
                 <button class="btn btn-primary mt-4" id="load_local">Load Flowchart</button>
-
-                <!-- Update Modal -->
-                <div class="modal fade" id="updateModal" role="dialog">
-                    <div class="modal-dialog modal-dialog-centered">
-                      <!-- Modal content-->
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h4 class="modal-title">Update Selected Card</h4>
-                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            </div>
-                            <div class="modal-body">
-                                <div id="operator_properties" style="display: block;">
-                                    <label for="operator_title" class="font-weight-bold">Card's title: </label>
-                                    <input id="operator_title" type="text" class="form-control">
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button id="delete_selected_button" class="btn btn-danger">Delete</button>
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary" data-dismiss="modal">Save</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <button class="btn btn-primary mt-4" id="generate_flowchart">Generate Flowchart</button>
 
                 <!-- Create Modal -->
                 <div class="modal fade" id="createModal" role="dialog">
@@ -170,7 +171,7 @@
                     </div>
                 </div>
             
-                <div class="mt-4">
+                <div class="mt-4" style="display: none;">
                     <textarea id="flowchart_data" class="form-control"></textarea>
                 </div>
             </div>
